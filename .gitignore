@@ -1,3 +1,6 @@
 /config.py
-/pb_data
+/pb_data/backups
+/pb_data/data-DZS-P106-04.db
+/pb_data/logs.db
+/pb_data/types.d.ts
 /pb_migrations
