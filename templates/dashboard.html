@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Welcome, {{ session['username'] }}</h1><br>
+<h4>My Bookings:</h4>
+<ul>
+    {% for booking in bookings %}
+        <li>
+            <strong>Event: {{ booking['title'] }}</strong><br>
+            Date: {{ booking['event_date'] }}<br>
+            Location: {{ booking['location']}}<br>
+            Status: {{ booking['status'] }}<br>
+        </li>
+        <form method="POST" action="{{ url_for('cancel_booking', booking_id=booking['id']) }}">
+            <button type="submit">Cancel Booking</button>
+        </form>
+    {% endfor %}
+</ul>
+{% endblock %}

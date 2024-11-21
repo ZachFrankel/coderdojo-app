@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Events{% endblock %}
+
+{% block content %}
+
+<h1>Events</h1>
+<ul>
+    {% for event in events %}
+        <li>
+            <strong>{{ event['title'] }}</strong><br>
+            Description: {{ event['desc'] }}<br>
+            Event Date: {{ event['event_date'] }}<br>
+            Location: {{ event['location'] }}<br>
+            Max Participants: {{ event['max_participants'] }}<br>
+        </li>
+        <form method="POST" action="{{ url_for('create_booking', event_id=event['id']) }}">
+            <button type="submit">Book</button>
+        </form>
+        {% if is_admin() %}
+            <form method="POST" action="{{ url_for('remove_event', event_id=event['id']) }}">
+                <button type="submit">Remove Event (Admin)</button>
+            </form>
+        {% endif %}
+    {% endfor %}
+</ul>
+
+{% endblock %}
