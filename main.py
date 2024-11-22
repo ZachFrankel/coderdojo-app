@@ -45,7 +45,10 @@ def home():
 
 @app.route('/about')
 def about():
-    return render_template('about.html', is_logged_in=is_logged_in, is_admin=is_admin)
+    conn = get_db_connection()
+    instructors = conn.execute('SELECT * FROM instructors').fetchall()
+    conn.close()
+    return render_template('about.html', is_logged_in=is_logged_in, is_admin=is_admin, instructors=instructors)
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():

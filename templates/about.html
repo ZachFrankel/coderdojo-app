@@ -3,6 +3,16 @@
 {% block title %}About Us{% endblock %}
 
 {% block content %}
-<h1>about coderbird</h1>
-<p>learninggg</p>
+<h1>About Us</h1>
+<ul class="instructors-list">
+    {% for instructor in instructors %}
+        <li class="instructor-item">
+            <img 
+                src="http://localhost:8090/api/files/instructors/{{ instructor['id'] }}/{{ instructor['pfp'] }}" 
+                class="profile-img"><br>
+
+            <strong>{{ instructor['name'] }}</strong><br>
+        </li>
+    {% endfor %}
+</ul>
 {% endblock %}
