@@ -32,4 +32,17 @@
 
     <button type="submit" name="action" value="add_event">Add Event</button>
 </form>
+
+<h2>Manage Events</h1>
+<ul>
+    {% for event in events %}
+        <li>
+            <strong>{{ event['title'] }}</strong><br>
+            Event Date: {{ event['event_date'] }}<br>
+        </li>
+        <form method="POST" action="{{ url_for('manage_event', event_id=event['id']) }}">
+            <button type="submit">Manage Event</button>
+        </form>
+    {% endfor %}
+</ul>
 {% endblock %}

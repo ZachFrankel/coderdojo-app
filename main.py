@@ -64,6 +64,8 @@ def admin():
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM users')
     users = cursor.fetchall()
+    cursor.execute('SELECT * FROM events')
+    events = cursor.fetchall()
     close_db_connection(conn)
 
     if request.method == 'POST':
@@ -94,7 +96,7 @@ def admin():
         close_db_connection(conn)
         return redirect(url_for('admin'))
 
-    return render_template('admin.html', users=users, is_logged_in=is_logged_in, is_admin=is_admin)
+    return render_template('admin.html', users=users, events=events, is_logged_in=is_logged_in, is_admin=is_admin)
 
 @app.route('/events')
 def events():
@@ -103,6 +105,22 @@ def events():
     conn.close()
 
     return render_template('events.html', is_logged_in=is_logged_in, is_admin=is_admin, events=events)
+
+@app.route('/admin/manage_event/<event_id>', methods=['GET', 'POST'])
+def manage_event(event_id):
+    if is_admin():
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM events WHERE id = ?', (event_id,))
+        event = cursor.fetchone()
+        cursor.execute('SELECT * FROM bookings WHERE eventID = ?', (event_id,))
+        bookings = cursor.fetchall()
+        conn.close()
+
+        return render_template('manageEvent.html', is_logged_in=is_logged_in, is_admin=is_admin, event=event, bookings=bookings)
+    else:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('home'))
 
 @app.route('/admin/remove_event/<event_id>', methods=['POST'])
 def remove_event(event_id):
