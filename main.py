@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_mail import Mail, Message
 from datetime import datetime
 
+from config import Config
+
 import uuid
 import sqlite3
 import bcrypt
@@ -9,6 +11,10 @@ import bcrypt
 app = Flask(__name__)
 app.config.from_object('config.Config')
 mail = Mail(app)
+
+nms = False
+if Config.MAIL_SERVER == '' or Config.MAIL_USERNAME == '' or Config.MAIL_PASSWORD == '' or Config.MAIL_DEFAULT_SENDER == '' or Config.MAIL_PORT == '':
+    nms = True
 
 def is_logged_in():
     return 'user_id' in session
@@ -139,9 +145,12 @@ def register():
 
         session[token] = email
 
-        msg = Message('confirm test', sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
-        msg.body = f'link: {link}'
-        mail.send(msg)
+        if nms:
+            print('\nNo mail server detected in your config file.\nContent of the email has been sent to the console.\n')
+        else:
+            msg = Message('confirm test', sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
+            msg.body = f'link: {link}'
+            mail.send(msg)
 
         print('')
         print(f"debug: {link}")
@@ -164,9 +173,12 @@ def send_reset_email_to_user(email):
     print(f"debug: {email}")
     print('')
     
-    msg = Message('reset email', sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
-    msg.body = f'{link}'
-    mail.send(msg)
+    if nms:
+        print('\nNo mail server detected in your config file.\nContent of the email has been sent to the console.\n')
+    else:
+        msg = Message('reset email', sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
+        msg.body = f'{link}'
+        mail.send(msg)
 
 @app.route('/auth/forgot', methods=['GET', 'POST'])
 def forgot_password():
