@@ -18,7 +18,7 @@ Requirements for the software
 > [!IMPORTANT]
 > This file is required, without it the website will not function.<br>
 > This file should be in the root directory of the project.<br>
-> If you do not have a mail server, keep all fields empty except 'SECRET_KEY'
+> If you do not have a mail server, keep all fields default.
 
 ```python
 import uuid
