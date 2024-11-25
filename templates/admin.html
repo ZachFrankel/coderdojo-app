@@ -1,48 +1,61 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Admin Dashboard</h1>
+<div class="container">
+    <h1>Admin Dashboard</h1>
+    <div class="container"></div>
+    <form method="POST">
+        <div class="form-group">
+            <label for="user">Select User:</label>
+            <select class="form-control" name="user_id" id="user" required>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary" type="submit" name="action" value="set_admin">Set as Admin</button>
+            <button class="btn btn-primary" type="submit" name="action" value="revoke_admin">Revoke Admin</button>
+        </div>
+    </form>
 
-<form method="POST">
-    <label for="user">Select User:</label>
-    <select name="user_id" id="user" required>
-        {% for user in users %}
-            <option value="{{ user.id }}">{{ user.username }}</option>
+    <h2>Add an event</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="title">Title:</label><br>
+            <input class="form-control" type="text" id="title" name="title" required><br>
+        </div>
+        <div class="form-group">
+            <label for="desc">Desc:</label><br>
+            <input class="form-control" type="text" id="desc" name="desc" required><br>
+        </div>
+        <div class="form-group">
+            <label for="eventDate">Event Date:</label><br>
+            <input class="form-control" type="datetime-local" id="event_date" name="event_date" required><br>
+        </div>
+        <div class="form-group">
+            <label for="location">Location:</label><br>
+            <input class="form-control" type="text" id="location" name="location" required><br>
+        </div>
+        <div class="form-group">
+            <label for="maxP">Max Participants:</label><br>
+            <input class="form-control" type="number" id="max_p" name="max_p" required><br>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary" type="submit" name="action" value="add_event">Add Event</button>
+        </div>
+    </form>
+
+    <h2>Manage Events</h2>
+    <ul>
+        {% for event in events %}
+            <li>
+                <strong>{{ event['title'] }}</strong><br>
+                Event Date: {{ event['event_date'] }}<br>
+            </li>
+            <form method="POST" action="{{ url_for('manage_event', event_id=event['id']) }}">
+                <button class="btn btn-primary" type="submit">Manage Event</button>
+            </form>
         {% endfor %}
-    </select>
-    <button type="submit" name="action" value="set_admin">Set as Admin</button>
-    <button type="submit" name="action" value="revoke_admin">Revoke Admin</button>
-</form>
-
-<h2>Add an event</h2>
-<form method="POST">
-    <label for="title">Title:</label><br>
-    <input type="text" id="title" name="title" required><br><br>
-
-    <label for="desc">Desc:</label><br>
-    <input type="text" id="desc" name="desc" required><br><br>
-
-    <label for="eventDate">Event Date:</label><br>
-    <input type="datetime-local" id="event_date" name="event_date" required><br><br>
-
-    <label for="location">Location:</label><br>
-    <input type="text" id="location" name="location" required><br><br>
-
-    <label for="maxP">Max Participants:</label><br>
-    <input type="number" id="max_p" name="max_p" required><br><br>
-
-    <button type="submit" name="action" value="add_event">Add Event</button>
-</form>
-
-<h2>Manage Events</h1>
-<ul>
-    {% for event in events %}
-        <li>
-            <strong>{{ event['title'] }}</strong><br>
-            Event Date: {{ event['event_date'] }}<br>
-        </li>
-        <form method="POST" action="{{ url_for('manage_event', event_id=event['id']) }}">
-            <button type="submit">Manage Event</button>
-        </form>
-    {% endfor %}
-</ul>
+    </ul>
+</div>
 {% endblock %}
