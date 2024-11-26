@@ -354,8 +354,11 @@ def login():
                     flash('A confirmation email has been sent. Please check your inbox.', 'info')
                     return redirect(url_for('login'))
             else:
-                flash('Login unsuccessful. Please check email and password.', 'danger')
+                flash('Invalid password. Please try again.', 'danger')
                 return redirect(url_for('login'))
+        else:
+            flash('Invalid email or password. Please try again.', 'danger')
+            return redirect(url_for('login'))
 
     return render_template('login.html', is_logged_in=is_logged_in)
 
