@@ -239,18 +239,19 @@ def admin():
     close_db_connection(conn)
 
     if request.method == 'POST':
-        user_id = request.form.get('user_id')
-        title = request.form.get('title')
-        desc = request.form.get('desc')
-        event_date = request.form.get('event_date')
-        location = request.form.get('location')
-        max_p = request.form.get('max_p')
         action = request.form.get('action')
-
-        dt = datetime.strptime(event_date, "%Y-%m-%dT%H:%M")
-        event_date = dt.strftime("%Y-%m-%d %H:%M:%S.000Z")
-
+        user_id = request.form.get('user_id')
+        
         conn = get_db_connection()
+        if action == 'add_event':
+            title = request.form.get('title')
+            desc = request.form.get('desc')
+            event_date = request.form.get('event_date')
+            location = request.form.get('location')
+            max_p = request.form.get('max_p')
+
+            dt = datetime.strptime(event_date, "%Y-%m-%dT%H:%M")
+            event_date = dt.strftime("%Y-%m-%d %H:%M:%S.000Z")
         if action == 'set_admin':
             conn.execute('UPDATE users SET admin = 1 WHERE id = ?', (user_id,))
             flash('Admin granted.', 'success')
