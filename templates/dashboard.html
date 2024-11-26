@@ -4,18 +4,48 @@
 
 {% block content %}
     <div class="container">
-        <h1>Welcome, {{ session['username'] }}</h1><br>
-        <h4>My Bookings:</h4>
-        <ul class="list-group">
+        <h1>Welcome, {{ session['username'] }}</h1>
+
+        <h2 class="mt-5">Your Bookings</h2>
+        <ul class="list-group mt-4">
             {% for booking in bookings %}
                 <li class="list-group-item">
-                    <strong>Event: {{ booking['title'] }}</strong><br>
-                    Date: {{ booking['event_date'] }}<br>
-                    Location: {{ booking['location']}}<br>
-                    Status: {{ booking['status'] }}<br>
-                    <form method="POST" action="{{ url_for('cancel_booking', booking_id=booking['id']) }}">
-                        <button type="submit" class="btn btn-danger">Cancel Booking</button>
-                    </form>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ booking['title'] }}</strong><br>
+                            Description: {{ booking['desc'] }}<br>
+                            Event Date: {{ booking['event_date'] }}<br>
+                            Location: {{ booking['location'] }}<br>
+                            Status: {{ booking['status'] }}<br>
+                        </div>
+                        <div>
+                            <form method="POST" action="{{ url_for('cancel_booking', booking_id=booking['id']) }}">
+                                <button type="submit" class="btn btn-danger mt-2">Cancel Booking</button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h2 class="mt-5">Your Waiting List</h2>
+        <ul class="list-group mt-4">
+            {% for waiting in waiting_list %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ waiting['title'] }}</strong><br>
+                            Description: {{ waiting['desc'] }}<br>
+                            Event Date: {{ waiting['event_date'] }}<br>
+                            Location: {{ waiting['location'] }}<br>
+                            Joined Waiting List On: {{ waiting['timestamp'] }}<br>
+                        </div>
+                        <div>
+                            <form method="POST" action="{{ url_for('remove_from_waiting_list', waiting_id=waiting['id']) }}">
+                                <button type="submit" class="btn btn-danger mt-2">Remove from Waiting List</button>
+                            </form>
+                        </div>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
