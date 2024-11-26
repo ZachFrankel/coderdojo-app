@@ -341,10 +341,11 @@ def create_booking(event_id):
                        (session['user_id'], event_id, datetime.now()))
         conn.commit()
         conn.close()
-        flash('Event is fully booked. You have been added to the waiting list.', 'info')
+        flash('You have been added to the waiting list.', 'info')
     elif action == 'book_event' and participants < max_participants:
         cursor.execute('INSERT INTO bookings (userID, eventID, status) VALUES (?, ?, ?)',
-                       (session['user_id'], event_id, 'booked'))
+                   (session['user_id'], event_id, 'booked'))
+        cursor.execute('UPDATE events SET participants = participants + 1 WHERE id = ?', (event_id,))
         conn.commit()
         conn.close()
         flash(f'Successfully booked event {event_id}', 'success')
@@ -358,20 +359,41 @@ def cancel_booking(booking_id):
     if not is_logged_in():
         flash('Must be logged in to perform this action.', 'danger')
         return redirect(url_for('login'))
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT userID from bookings WHERE id = ?', (booking_id,))
-    id_check = cursor.fetchone()
-    id_check = id_check['userID']
+    cursor.execute('SELECT userID, eventID FROM bookings WHERE id = ?', (booking_id,))
+    booking = cursor.fetchone()
 
-    if id_check != session['user_id']:
+    # if not booking:
+    #     flash('Booking not found.', 'danger')
+    #     close_db_connection(conn)
+    #     return redirect(url_for('dashboard'))
+
+    if booking['userID'] != session['user_id']:
         flash('Access denied.', 'danger')
+        close_db_connection(conn)
         return redirect(url_for('home'))
-    conn.execute('DELETE FROM bookings WHERE id = ?', (booking_id,))
-    conn.commit() 
-    conn.close()
 
-    flash('Cancelled Booking (Future: Add email confirmation for cancellation & make sure the user is same as userID for the id).', 'success')
+    event_id = booking['eventID']
+    cursor.execute('DELETE FROM bookings WHERE id = ?', (booking_id,))
+    cursor.execute('UPDATE events SET participants = participants - 1 WHERE id = ?', (event_id,))
+    conn.commit()
+
+    # Check if there is a waiting list for the event
+    cursor.execute('SELECT * FROM waiting_list WHERE eventID = ? ORDER BY timestamp ASC LIMIT 1', (event_id,))
+    waiting_user = cursor.fetchone()
+
+    if waiting_user:
+        # Move the first user from the waiting list to the bookings
+        cursor.execute('INSERT INTO bookings (userID, eventID, status) VALUES (?, ?, ?)',
+                       (waiting_user['userID'], event_id, 'booked'))
+        cursor.execute('DELETE FROM waiting_list WHERE id = ?', (waiting_user['id']))
+        conn.commit()
+        flash('waiting list works yay :D', 'success')
+
+    close_db_connection(conn)
+    flash('Cancelled Booking.', 'success')
     return redirect(url_for('dashboard'))
 
 @app.route('/dashboard')
