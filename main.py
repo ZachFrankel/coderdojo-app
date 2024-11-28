@@ -62,7 +62,7 @@ def register():
         conn = get_db_connection()
         cursor = conn.cursor()
        
-        cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
+        cursor.execute('SELECT * FROM users WHERE email = ?', (email,)) 
         existing_user = cursor.fetchone()
        
         if existing_user:
@@ -375,12 +375,10 @@ def cancel_booking(booking_id):
     cursor.execute('UPDATE events SET participants = participants - 1 WHERE id = ?', (event_id,))
     conn.commit()
 
-    # Check if there is a waiting list for the event
     cursor.execute('SELECT * FROM waiting_list WHERE eventID = ? ORDER BY timestamp ASC LIMIT 1', (event_id,))
     waiting_user = cursor.fetchone()
 
     if waiting_user:
-        # Move the first user from the waiting list to the bookings
         cursor.execute('INSERT INTO bookings (userID, eventID, status) VALUES (?, ?, ?)',
                        (waiting_user['userID'], event_id, 'booked'))
         cursor.execute('DELETE FROM waiting_list WHERE id = ?', (waiting_user['id'],))
