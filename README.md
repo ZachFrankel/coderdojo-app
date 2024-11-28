@@ -72,3 +72,13 @@ localhost:8090/_/
 > [!TIP]
 > PocketBase Email: test@test.com<br>
 > PocketBase Password: admin12345!
+
+### System Requirements
+
+- 2x RTX 4090
+- AMD Threadripper 3970X (64 Cores)
+- 256 GB DDR5 6000Mhz
+- 128PB NVME Storage
+- Poundland Keyboard & Mouse
+- Samsung Odyssey G9 49"
+- 1600W PSU
