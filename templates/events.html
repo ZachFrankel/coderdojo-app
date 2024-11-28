@@ -15,8 +15,7 @@
                         Description: {{ event['desc'] }}<br>
                         Event Date: {{ event['event_date'] }}<br>
                         Location: {{ event['location'] }}<br>
-                        Max Participants: {{ event['max_participants'] }}<br>
-                        Current Participants: {{ event['participants'] }}<br>
+                        Participants: {{ event['participants'] }} / {{ event['max_participants'] }}<br>
                     </div>
                     <div>
                         {% if event['participants'] >= event['max_participants'] %}

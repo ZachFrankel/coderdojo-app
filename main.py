@@ -218,7 +218,13 @@ def events():
     ''').fetchall()
     conn.close()
 
-    return render_template('events.html', is_logged_in=is_logged_in, is_admin=is_admin, events=events)
+    e = []
+    for event in events:
+        event_dict = dict(event)
+        event_dict['event_date'] = datetime.strptime(event['event_date'], "%Y-%m-%d %H:%M:%S.000Z").strftime("%d/%m/%Y %H:%M")
+        e.append(event_dict)
+
+    return render_template('events.html', is_logged_in=is_logged_in, is_admin=is_admin, events=e)
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
