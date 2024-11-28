@@ -365,11 +365,6 @@ def cancel_booking(booking_id):
     cursor.execute('SELECT userID, eventID FROM bookings WHERE id = ?', (booking_id,))
     booking = cursor.fetchone()
 
-    # if not booking:
-    #     flash('Booking not found.', 'danger')
-    #     close_db_connection(conn)
-    #     return redirect(url_for('dashboard'))
-
     if booking['userID'] != session['user_id']:
         flash('Access denied.', 'danger')
         close_db_connection(conn)
@@ -388,7 +383,7 @@ def cancel_booking(booking_id):
         # Move the first user from the waiting list to the bookings
         cursor.execute('INSERT INTO bookings (userID, eventID, status) VALUES (?, ?, ?)',
                        (waiting_user['userID'], event_id, 'booked'))
-        cursor.execute('DELETE FROM waiting_list WHERE id = ?', (waiting_user['id']))
+        cursor.execute('DELETE FROM waiting_list WHERE id = ?', (waiting_user['id'],))
         conn.commit()
         flash('waiting list works yay :D', 'success')
 
