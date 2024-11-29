@@ -66,9 +66,9 @@
                         <div class="event-title">{{ event['title'] }}</div>
                         <div class="event-date">{{ event['event_date'] }}</div>
                     </div>
-                    <form method="POST" action="{{ url_for('manage_event', event_id=event['id']) }}">
-                        <button class="btn btn-primary">Manage Event</button>
-                    </form>
+                    <!-- <form method="POST" action="{{ url_for('manage_event', event_id=event['id']) }}"> -->
+                        <button class="btn btn-primary disabled">Manage Event</button> <!-- disabled -->
+                    <!-- </form> -->
                 </li>
             {% endfor %}
         </ul>

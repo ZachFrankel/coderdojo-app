@@ -106,7 +106,7 @@ def auth_confirm(token):
         conn.commit()
         close_db_connection(conn)
 
-        flash('confirmed email, login now', 'success')
+        flash('Successfully confirmed email, you may now login.', 'success')
         return redirect(url_for('login'))
     else:
         flash('Link is invalid or has expired.', 'danger')
@@ -142,7 +142,7 @@ def login():
                     flash('A confirmation email has been sent. Please check your inbox.', 'info')
                     return redirect(url_for('login'))
             else:
-                flash('Invalid password. Please try again.', 'danger')
+                flash('Invalid email or password. Please try again.', 'danger')
                 return redirect(url_for('login'))
         else:
             flash('Invalid email or password. Please try again.', 'danger')
@@ -172,7 +172,7 @@ def forgot_password():
             flash('A reset email has been sent. Please check your inbox.', 'info')
             return redirect(url_for('login'))
         else:
-            flash('Invalid email address.', 'danger')
+            flash('Link is invalid or has expired.', 'danger')
             return redirect(url_for('forgot_password'))
     
     return render_template('forgotPassword.html', is_logged_in=is_logged_in, is_admin=is_admin)
@@ -180,7 +180,7 @@ def forgot_password():
 @app.route('/auth/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if token != session.get('reset_token'):
-        flash('Invalid or expired token.', 'danger')
+        flash('Link is invalid or has expired.', 'danger')
         return redirect(url_for('forgot_password'))
 
     if request.method == 'POST':
@@ -244,6 +244,12 @@ def admin():
     events = cursor.fetchall()
     close_db_connection(conn)
 
+    e = []
+    for event in events:
+        event_dict = dict(event)
+        event_dict['event_date'] = datetime.strptime(event['event_date'], "%Y-%m-%d %H:%M:%S.000Z").strftime("%d/%m/%Y %H:%M")
+        e.append(event_dict)
+
     if request.method == 'POST':
         action = request.form.get('action')
         user_id = request.form.get('user_id')
@@ -273,7 +279,7 @@ def admin():
         close_db_connection(conn)
         return redirect(url_for('admin'))
 
-    return render_template('admin.html', users=users, events=events, is_logged_in=is_logged_in, is_admin=is_admin)
+    return render_template('admin.html', users=users, events=e, is_logged_in=is_logged_in, is_admin=is_admin)
 
 @app.route('/admin/manage_event/<event_id>', methods=['GET', 'POST'])
 def manage_event(event_id):
@@ -321,7 +327,7 @@ def remove_from_waiting_list(waiting_id):
         conn.commit()
         flash('You have been removed from the waiting list.', 'success')
     else:
-        flash('Access denied or invalid waiting list entry.', 'danger')
+        flash('Access denied.', 'danger')
 
     close_db_connection(conn)
     return redirect(url_for('dashboard'))
@@ -354,7 +360,7 @@ def create_booking(event_id):
         cursor.execute('UPDATE events SET participants = participants + 1 WHERE id = ?', (event_id,))
         conn.commit()
         conn.close()
-        flash(f'Successfully booked event {event_id}', 'success')
+        flash(f'Successfully booked the event.', 'success')
     else:
         flash('Event is fully booked. You cannot book this event.', 'danger')
 
@@ -390,7 +396,6 @@ def cancel_booking(booking_id):
         cursor.execute('DELETE FROM waiting_list WHERE id = ?', (waiting_user['id'],))
         cursor.execute('UPDATE events SET participants = participants + 1 WHERE id = ?', (event_id,))
         conn.commit()
-        flash('waiting list works yay :D', 'success')
 
     close_db_connection(conn)
     flash('Cancelled Booking.', 'success')
@@ -399,7 +404,7 @@ def cancel_booking(booking_id):
 @app.route('/dashboard')
 def dashboard():
     if not is_logged_in():
-        flash('Login to access this page.', 'warning')
+        flash('Must be logged in to perform this action.', 'danger')
         return redirect(url_for('login'))
     
     conn = get_db_connection()
@@ -430,14 +435,14 @@ def send_reset_email_to_user(email):
     
     session['reset_token'] = token
     session['reset_email'] = email
-
-    print('')
-    print(f"debug: {link}")
-    print(f"debug: {email}")
-    print('')
     
     if nms:
         print('\nNo mail server detected in your config file.\nContent of the email has been sent to the console.\n')
+
+        print('')
+        print(f"debug: {link}")
+        print(f"debug: {email}")
+        print('')
     else:
         msg = Message('reset email', sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
         msg.body = f'{link}'
