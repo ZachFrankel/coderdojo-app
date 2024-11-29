@@ -363,7 +363,7 @@ def create_booking(event_id):
         flash('You have been added to the waiting list.', 'info')
     elif action == 'book_event' and participants < max_participants:
         cursor.execute('INSERT INTO bookings (userID, eventID, status) VALUES (?, ?, ?)',
-                   (session['user_id'], event_id, 'booked'))
+                   (session['user_id'], event_id, 'Booked'))
         cursor.execute('UPDATE events SET participants = participants + 1 WHERE id = ?', (event_id,))
         conn.commit()
         conn.close()
@@ -399,7 +399,7 @@ def cancel_booking(booking_id):
 
     if waiting_user:
         cursor.execute('INSERT INTO bookings (userID, eventID, status) VALUES (?, ?, ?)',
-                       (waiting_user['userID'], event_id, 'booked'))
+                       (waiting_user['userID'], event_id, 'Booked'))
         cursor.execute('DELETE FROM waiting_list WHERE id = ?', (waiting_user['id'],))
         cursor.execute('UPDATE events SET participants = participants + 1 WHERE id = ?', (event_id,))
         conn.commit()
@@ -424,6 +424,12 @@ def dashboard():
     ''', (session['user_id'],))
     bookings = cursor.fetchall()
 
+    b = []
+    for booking in bookings:
+        event_dict = dict(booking)
+        event_dict['event_date'] = datetime.strptime(booking['event_date'], "%Y-%m-%d %H:%M:%S.000Z").strftime("%d/%m/%Y %H:%M")
+        b.append(event_dict)
+
     cursor.execute('''
         SELECT waiting_list.*, events.title, events.desc, events.event_date, events.location
         FROM waiting_list
@@ -434,7 +440,7 @@ def dashboard():
 
     close_db_connection(conn)
 
-    return render_template('dashboard.html', is_logged_in=is_logged_in, is_admin=is_admin, bookings=bookings, waiting_list=waiting_list)
+    return render_template('dashboard.html', is_logged_in=is_logged_in, is_admin=is_admin, bookings=b, waiting_list=waiting_list)
 
 def send_reset_email_to_user(email):
     token = str(uuid.uuid4().hex)
