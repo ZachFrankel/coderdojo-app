@@ -216,6 +216,13 @@ def events():
         LEFT JOIN bookings ON events.id = bookings.eventID
         GROUP BY events.id
     ''').fetchall()
+
+    bookings = []
+    if is_logged_in():
+        cursor = conn.cursor()
+        cursor.execute('SELECT eventID FROM bookings WHERE userID = ?', (session['user_id'],))
+        bookings = [booking['eventID'] for booking in cursor.fetchall()]
+
     conn.close()
 
     e = []
@@ -224,7 +231,7 @@ def events():
         event_dict['event_date'] = datetime.strptime(event['event_date'], "%Y-%m-%d %H:%M:%S.000Z").strftime("%d/%m/%Y %H:%M")
         e.append(event_dict)
 
-    return render_template('events.html', is_logged_in=is_logged_in, is_admin=is_admin, events=e)
+    return render_template('events.html', is_logged_in=is_logged_in, is_admin=is_admin, events=e, bookings=bookings)
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():

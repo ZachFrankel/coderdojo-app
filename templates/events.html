@@ -18,7 +18,9 @@
                         Participants: {{ event['participants'] }} / {{ event['max_participants'] }}<br>
                     </div>
                     <div>
-                        {% if event['participants'] >= event['max_participants'] %}
+                        {% if event['id'] in bookings %}
+                            <button class="btn btn-secondary mt-2" disabled>Booked</button>
+                        {% elif event['participants'] >= event['max_participants'] %}
                             <form method="POST" action="{{ url_for('create_booking', event_id=event['id']) }}">
                                 <input type="hidden" name="action" value="join_waiting_list">
                                 <button type="submit" class="btn btn-warning mt-2">Join Waiting List</button>
