@@ -388,6 +388,7 @@ def cancel_booking(booking_id):
         cursor.execute('INSERT INTO bookings (userID, eventID, status) VALUES (?, ?, ?)',
                        (waiting_user['userID'], event_id, 'booked'))
         cursor.execute('DELETE FROM waiting_list WHERE id = ?', (waiting_user['id'],))
+        cursor.execute('UPDATE events SET participants = participants + 1 WHERE id = ?', (event_id,))
         conn.commit()
         flash('waiting list works yay :D', 'success')
 
